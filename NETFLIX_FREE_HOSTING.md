@@ -6,6 +6,23 @@
 https://store.kmsdev.id.vn/api/netflix-free
 ~~~
 
+## Đăng nhập bắt buộc
+
+Trang và các API `links`, `claim`, `release` chỉ dùng được sau khi đăng nhập. Lấy JWT từ API đăng nhập:
+
+~~~http
+POST https://store.kmsdev.id.vn/api/auth/login
+Content-Type: application/json
+~~~
+
+Sau đó gửi header này cho các request cần bảo vệ:
+
+~~~http
+Authorization: Bearer JWT_CUA_NGUOI_DUNG
+~~~
+
+Endpoint `open` không cần gửi header vì assignment token đã là quyền mở link tạm thời.
+
 ## 1. Lấy danh sách link
 
 ~~~http
@@ -17,7 +34,8 @@ JavaScript:
 
 ~~~js
 const res = await fetch(
-  'https://store.kmsdev.id.vn/api/netflix-free/links'
+  'https://store.kmsdev.id.vn/api/netflix-free/links',
+  { headers: { Authorization: `Bearer ${jwt}` } }
 )
 
 const json = await res.json()
@@ -68,7 +86,8 @@ const res = await fetch(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${jwt}`
     },
     body: JSON.stringify({
       cookie_id: 760,
@@ -150,7 +169,8 @@ await fetch(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${jwt}`
     },
     body: JSON.stringify({
       token: assignment.token
@@ -179,7 +199,7 @@ POST /release khi người dùng trả link
 
 ## Lưu ý
 
-- API hiện không yêu cầu token đăng nhập.
+- API links, claim và release bắt buộc có JWT Bearer hợp lệ.
 - Không lưu hoặc ghi log assignment.token.
 - Không gọi POST /claim liên tục; hệ thống có giới hạn request.
 - Nếu website khác domain bị CORS, hãy gọi API qua backend proxy.
