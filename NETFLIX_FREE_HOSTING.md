@@ -365,3 +365,5 @@ Không retry POST claim tự động nhiều lần.
 [ ] Không log hoặc public token
 [ ] Nếu khác domain, đã kiểm tra CORS hoặc dùng backend proxy
 ~~~
+
+<!-- Dev by KMSDEV -->
