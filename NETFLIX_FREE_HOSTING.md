@@ -6,20 +6,17 @@
 https://store.kmsdev.id.vn/api/netflix-free
 ~~~
 
-## Đăng nhập bắt buộc
+## Tạo API token
 
-Trang và các API `links`, `claim`, `release` chỉ dùng được sau khi đăng nhập. Lấy JWT từ API đăng nhập:
+Đăng nhập website, vào **Tài khoản cá nhân → Quản lý API token**, bấm **Tạo API token**. Token đầy đủ chỉ hiện một lần; hãy lưu lại an toàn. Nếu nghi token bị lộ, bấm **Reset API token** để vô hiệu hóa token cũ và tạo token mới.
 
-~~~http
-POST https://store.kmsdev.id.vn/api/auth/login
-Content-Type: application/json
-~~~
-
-Sau đó gửi header này cho các request cần bảo vệ:
+Gửi token qua header sau khi gọi API:
 
 ~~~http
-Authorization: Bearer JWT_CUA_NGUOI_DUNG
+X-API-Key: kms_live_TOKEN_CUA_BAN
 ~~~
+
+Có thể dùng `Authorization: Bearer kms_live_TOKEN_CUA_BAN` thay cho `X-API-Key`.
 
 Endpoint `open` không cần gửi header vì assignment token đã là quyền mở link tạm thời.
 
@@ -35,7 +32,7 @@ JavaScript:
 ~~~js
 const res = await fetch(
   'https://store.kmsdev.id.vn/api/netflix-free/links',
-  { headers: { Authorization: `Bearer ${jwt}` } }
+  { headers: { 'X-API-Key': apiToken } }
 )
 
 const json = await res.json()
@@ -87,7 +84,7 @@ const res = await fetch(
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': `Bearer ${jwt}`
+      'X-API-Key': apiToken
     },
     body: JSON.stringify({
       cookie_id: 760,
@@ -170,7 +167,7 @@ await fetch(
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': `Bearer ${jwt}`
+      'X-API-Key': apiToken
     },
     body: JSON.stringify({
       token: assignment.token
@@ -199,7 +196,9 @@ POST /release khi người dùng trả link
 
 ## Lưu ý
 
-- API links, claim và release bắt buộc có JWT Bearer hợp lệ.
+- API links, claim và release bắt buộc có API token hợp lệ.
+- Token chỉ nên đặt ở backend/server hoặc biến môi trường riêng; không nhúng vào mã JavaScript công khai.
+- Reset/thu hồi token sẽ làm token cũ không dùng được ngay.
 - Không lưu hoặc ghi log assignment.token.
 - Không gọi POST /claim liên tục; hệ thống có giới hạn request.
 - Nếu website khác domain bị CORS, hãy gọi API qua backend proxy.
